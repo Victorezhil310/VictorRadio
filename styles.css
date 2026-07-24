@@ -461,9 +461,34 @@ select:focus, input:focus, textarea:focus {
     border-color: var(--cyan-primary);
 }
 
-/* ==========================================================================
-   SOLAR SYSTEM PLANETARY AUDIO LABORATORY
-   ========================================================================== */
+/* Solar System Sound Lab Cards with Photos */
+.planet-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.planet-photo {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.planet-symbol {
+    font-size: 28px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--surface-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+}
+
 .planet-lab-container {
     display: flex;
     flex-direction: column;
@@ -587,24 +612,6 @@ select:focus, input:focus, textarea:focus {
     background: linear-gradient(135deg, var(--surface-card), rgba(0, 230, 118, 0.05));
 }
 
-.planet-card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.planet-symbol {
-    font-size: 28px;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: var(--surface-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-color);
-}
-
 .planet-title-group h3 {
     font-size: 14px;
     font-weight: 800;
@@ -642,16 +649,14 @@ select:focus, input:focus, textarea:focus {
     font-size: 11px;
 }
 
-/* ==========================================================================
-   SPACE RESEARCH TOOLS & CALCULATORS
-   ========================================================================== */
-.research-tools-container {
+/* Research & Multiverse Tools Grid */
+.research-tools-container, .multiverse-container {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
-.research-tools-container h2 {
+.research-tools-container h2, .multiverse-container h2 {
     font-size: 15px;
     font-weight: 800;
     color: var(--cyan-primary);
@@ -740,9 +745,7 @@ select:focus, input:focus, textarea:focus {
     gap: 8px;
 }
 
-/* ==========================================================================
-   SIGNAL LIBRARY
-   ========================================================================== */
+/* Signal Library */
 .library-container {
     display: flex;
     flex-direction: column;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VictorRadio - Deep Space Research & Planetary RF Sound Explorer</title>
+    <title>VictorRadio - Deep Space Research, Quantum Multiverse & Planetary RF Explorer</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -15,7 +15,7 @@
                 <div class="logo-icon">📡</div>
                 <div>
                     <h1>VICTOR RADIO</h1>
-                    <p class="subtitle">Deep Space Research, Relativistic Physics & Solar System Audio Laboratory</p>
+                    <p class="subtitle">Deep Space Research, Multiverse Physics & Solar System Audio Laboratory</p>
                 </div>
             </div>
             <div class="header-right">
@@ -39,7 +39,8 @@
                 <div class="top-tab-bar">
                     <button class="top-tab-btn active" data-tab="tab-spectrum">📡 Spectrum & Waterfall</button>
                     <button class="top-tab-btn" data-tab="tab-planets">🪐 Solar System Sound Lab</button>
-                    <button class="top-tab-btn" data-tab="tab-research">🔬 Space & Gravity Physics Tools</button>
+                    <button class="top-tab-btn" data-tab="tab-research">🔬 Astrophysics & Relativity Suite</button>
+                    <button class="top-tab-btn" data-tab="tab-multiverse">🌀 Multiverse & Time Travel Engine</button>
                     <button class="top-tab-btn" data-tab="tab-library">💾 Signal Library</button>
                 </div>
 
@@ -96,7 +97,7 @@
                                 <button id="fineTuneDownBtn" class="tune-btn" title="Tune -0.025 MHz">-</button>
                                 <button id="fineTuneUpBtn" class="tune-btn" title="Tune +0.025 MHz">+</button>
                             </div>
-                            <input type="range" id="freqSlider" min="100" max="3000" step="0.005" value="1420.405">
+                            <input type="range" id="freqSlider" min="0.1" max="10000" step="0.005" value="1420.405">
                         </div>
 
                         <div class="control-group">
@@ -137,7 +138,7 @@
                     <div class="planet-lab-container">
                         <div class="planet-lab-header">
                             <div>
-                                <h2>SOLAR SYSTEM PLANETARY AUDIO LABORATORY</h2>
+                                <h2>SOLAR SYSTEM PLANETARY AUDIO & VISUAL LABORATORY</h2>
                                 <p class="lab-desc">Authentic sonification of magnetospheric plasma waves, atmospheric turbulence, helioseismology, & radio emissions for educational research.</p>
                             </div>
                             <div class="global-audio-controls">
@@ -204,7 +205,7 @@
                                             <input type="number" id="timeVelocityPct" value="10" min="0" max="99.999" step="0.1">
                                         </div>
                                     </div>
-                                    <div class="calc-result" id="timeDilationResult">Gravitational Redshift: 6.96 × 10⁻¹⁰ | Lorentz Factor γ: 1.005 | Time Dilation Rate: 1.0051x slower</div>
+                                    <div class="calc-result" id="timeDilationResult">Gravitational Redshift: -- | Lorentz Factor γ: --</div>
                                 </div>
                             </div>
 
@@ -286,107 +287,88 @@
                                     <div class="calc-result" id="antennaResult">Gain: 31.02 dBi | HPBW: 4.93°</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <!-- Tool 5: CMB Radiation Spectrum -->
+                <!-- Tab 4: Quantum Multiverse & Time Travel Engine -->
+                <div id="tab-multiverse" class="tab-pane">
+                    <div class="multiverse-container">
+                        <h2>🌀 QUANTUM MULTIVERSE & EINSTEIN-ROSEN TIME TRAVEL ENGINE</h2>
+                        <p class="lab-desc">Theoretical physics simulation for wormhole throat metric tensor traversal, closed timelike curves (CTCs), & parallel universe decoherence resonance.</p>
+
+                        <div class="tools-grid">
+                            <!-- Multiverse Tool 1: Wormhole Metric -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
-                                    <h3>✨ COSMIC MICROWAVE BACKGROUND (CMB) SPECTRUM</h3>
-                                    <span class="tool-tag">COSMOLOGY</span>
+                                    <h3>🕳️ MORRIS-THORNE WORMHOLE TRAVERSAL METRIC</h3>
+                                    <span class="tool-tag">GENERAL RELATIVITY</span>
                                 </div>
                                 <div class="tool-form">
                                     <div class="form-row">
                                         <div class="input-field">
-                                            <label>CMB Temperature T (Kelvin)</label>
-                                            <input type="number" id="cmbTemp" value="2.7255" step="0.0001">
+                                            <label>Throat Radius r₀ (meters)</label>
+                                            <input type="number" id="wormholeRadius" value="1000" step="100">
                                         </div>
                                         <div class="input-field">
-                                            <label>Target Frequency (GHz)</label>
-                                            <input type="number" id="cmbFreq" value="160.2" step="0.1">
+                                            <label>Exotic Matter Tension T₀ (Joules/m³)</label>
+                                            <input type="number" id="exoticTension" value="1e19">
                                         </div>
                                     </div>
-                                    <div class="calc-result" id="cmbResult">Peak Freq: 160.2 GHz | Peak Wavelength: 1.06 mm | Energy Density: 4.17 × 10⁻¹⁴ J/m³</div>
+                                    <div class="calc-result" id="wormholeResult">Negative Mass-Energy Required: -- | Tidal Force at Throat: Safe</div>
                                 </div>
                             </div>
 
-                            <!-- Tool 6: Satellite Orbit Period & Delay -->
+                            <!-- Multiverse Tool 2: Closed Timelike Curve (CTC) Time Travel -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
-                                    <h3>🛰️ SATELLITE ORBITAL MECHANICS & ESCAPE VELOCITY</h3>
-                                    <span class="tool-tag">ORBITAL MECHANICS</span>
+                                    <h3>⏳ KERR BLACK HOLE CLOSED TIMELIKE CURVE (CTC) TIME SHIFT</h3>
+                                    <span class="tool-tag">SPACETIME METRIC</span>
                                 </div>
                                 <div class="tool-form">
                                     <div class="form-row">
                                         <div class="input-field">
-                                            <label>Orbital Altitude (km)</label>
-                                            <input type="number" id="satAlt" value="408" step="10">
+                                            <label>Spin Parameter a (J/Mc)</label>
+                                            <input type="number" id="blackHoleSpin" value="0.99" min="0" max="0.999" step="0.01">
                                         </div>
                                         <div class="input-field">
-                                            <label>Elevation Angle (°)</label>
-                                            <input type="number" id="satElev" value="45" step="1">
+                                            <label>Destination Target Year</label>
+                                            <input type="number" id="targetYear" value="1977" step="1">
                                         </div>
                                     </div>
-                                    <div class="calc-result" id="satResult">Period: 92.68 min | Speed: 7.67 km/s | Escape Speed: 10.84 km/s</div>
+                                    <div class="gw-actions">
+                                        <button id="warpTimeBtn" class="btn btn-primary">🌀 INITIALIZE WORMHOLE WARP</button>
+                                    </div>
+                                    <div class="calc-result" id="timeShiftResult">Temporal Offset Δt: -- | Novikov Self-Consistency Condition: ACTIVE</div>
                                 </div>
                             </div>
 
-                            <!-- Tool 7: FSPL Calculator -->
-                            <div class="research-tool-card">
-                                <div class="tool-card-header">
-                                    <h3>📡 FREE SPACE PATH LOSS (FSPL)</h3>
-                                    <span class="tool-tag">PROPAGATION</span>
-                                </div>
-                                <div class="tool-form">
-                                    <div class="form-row">
-                                        <div class="input-field">
-                                            <label>Dist (km)</label>
-                                            <input type="number" id="fsplDist" value="149600000">
-                                        </div>
-                                        <div class="input-field">
-                                            <label>Freq (MHz)</label>
-                                            <input type="number" id="fsplFreq" value="1420.405">
-                                        </div>
-                                    </div>
-                                    <div class="calc-result" id="fsplResult">Attenuation: 259.04 dB</div>
-                                </div>
-                            </div>
-
-                            <!-- Tool 8: EME Echo -->
-                            <div class="research-tool-card">
-                                <div class="tool-card-header">
-                                    <h3>🌕 EARTH-MOON-EARTH (EME) BOUNCE</h3>
-                                    <span class="tool-tag">LUNAR BOUNCE</span>
-                                </div>
-                                <div class="tool-form">
-                                    <div class="form-row">
-                                        <div class="input-field">
-                                            <label>Tx Power (W)</label>
-                                            <input type="number" id="emePower" value="100">
-                                        </div>
-                                        <div class="input-field">
-                                            <label>Freq (MHz)</label>
-                                            <input type="number" id="emeFreq" value="1296.0">
-                                        </div>
-                                    </div>
-                                    <div class="calc-result" id="emeResult">Delay: 2.565 sec | Path Loss: 271.4 dB</div>
-                                </div>
-                            </div>
-
-                            <!-- Tool 9: Telemetry Hex -->
+                            <!-- Multiverse Tool 3: Parallel Universe Branching -->
                             <div class="research-tool-card full-width-card">
                                 <div class="tool-card-header">
-                                    <h3>💻 TELEMETRY HEX PACKET INSPECTOR</h3>
-                                    <span class="tool-tag">DECODER</span>
+                                    <h3>🌌 EVERETT MANY-WORLDS MULTIVERSE DECOHERENCE SELECTOR</h3>
+                                    <span class="tool-tag">QUANTUM MECHANICS</span>
                                 </div>
                                 <div class="tool-form">
-                                    <textarea id="hexInput" rows="2" placeholder="Hex bytes...">36 45 51 55 4A 35 20 53 45 54 49 20 48 59 44 52 4F 47 45 4E</textarea>
-                                    <div class="calc-result" id="hexResult">Decoded: 6EQUJ5 SETI HYDROGEN</div>
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Quantum Hilbert Space State (|Ψ⟩)</label>
+                                            <select id="universeBranchSelect">
+                                                <option value="alpha">Universe Alpha-1 (Standard Timeline)</option>
+                                                <option value="beta">Universe Beta-9 (Anti-Matter Dominated)</option>
+                                                <option value="gamma">Universe Gamma-4 (High Gravitational Constant G)</option>
+                                                <option value="delta">Universe Delta-7 (No Solar System Magnetic Field)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="multiverseResult">Decoherence Entropy S: 4.82 × 10²³ k_B | Quantum Wavefunction Phase: |Ψ_universe⟩ = 0.707|0⟩ + 0.707|1⟩</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab 4: Signal Library -->
+                <!-- Tab 5: Signal Library -->
                 <div id="tab-library" class="tab-pane">
                     <div class="library-container">
                         <div class="library-header-bar">
