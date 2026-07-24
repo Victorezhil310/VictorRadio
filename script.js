@@ -1,4 +1,4 @@
-// VictorRadio - Deep Space Research & Solar System Audio Engine
+// VictorRadio - Deep Space Research, Physics & Planetary Audio Engine
 
 // --- Main State ---
 const state = {
@@ -11,11 +11,11 @@ const state = {
     notchFilter: false,
     activeTargetName: "Hydrogen Line (HI)",
     activePlanetId: null,
-    planetVolume: 0.7,
+    planetVolume: 0.8,
     savedSignals: []
 };
 
-// --- Planetary Sound Data ---
+// Planetary Sound Metadata
 const planetsData = [
     {
         id: "sun",
@@ -141,18 +141,79 @@ const spaceTargets = [
     { name: "WOW! Signal (1977 Peak)", category: "SETI Candidate", freq: 1420.456, dist: "Sagittarius Constellation", desc: "Narrowband radio signal detected by Ohio State Big Ear telescope." }
 ];
 
-// --- Audio Synthesizers ---
+// --- Audio Synthesizer Core ---
 let audioCtx = null;
 let planetAudioNodes = null;
 let planetAnalyserNode = null;
 let demodAudioNodes = null;
 
-function ensureAudioCtx() {
+function getAudioCtx() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    if (audioCtx.state === "suspended") {
+    if (audioCtx && audioCtx.state === "suspended") {
         audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// --- Spectrum Demodulation Audio Engine ---
+function toggleDemodAudio() {
+    const ctx = getAudioCtx();
+    state.audioMuted = !state.audioMuted;
+
+    if (!demodAudioNodes) {
+        // Create Demod Noise & Carrier Synth
+        const bufferSize = ctx.sampleRate * 2;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+
+        const noiseNode = ctx.createBufferSource();
+        noiseNode.buffer = noiseBuffer;
+        noiseNode.loop = true;
+
+        const toneNode = ctx.createOscillator();
+        toneNode.type = "sine";
+        toneNode.frequency.value = 800;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 1000;
+        filter.Q.value = 3.0;
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 0;
+
+        noiseNode.connect(filter);
+        toneNode.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        noiseNode.start();
+        toneNode.start();
+
+        demodAudioNodes = { noiseNode, toneNode, filter, gainNode };
+    }
+
+    const btn = document.getElementById("audioToggleBtn");
+    if (state.audioMuted) {
+        demodAudioNodes.gainNode.gain.setTargetAtTime(0, ctx.currentTime, 0.05);
+        if (btn) {
+            btn.textContent = "🔊 START DEMOD AUDIO";
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-outline");
+        }
+    } else {
+        const volume = (state.gainDb / 60) * 0.12;
+        demodAudioNodes.gainNode.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
+        if (btn) {
+            btn.textContent = "🔇 MUTE DEMOD AUDIO";
+            btn.classList.remove("btn-outline");
+            btn.classList.add("btn-primary");
+        }
     }
 }
 
@@ -170,7 +231,7 @@ function stopPlanetAudio() {
 }
 
 function startPlanetAudio(planetId) {
-    ensureAudioCtx();
+    const ctx = getAudioCtx();
     stopPlanetAudio();
 
     const planet = planetsData.find(p => p.id === planetId);
@@ -178,34 +239,33 @@ function startPlanetAudio(planetId) {
 
     state.activePlanetId = planetId;
 
-    const masterGain = audioCtx.createGain();
+    const masterGain = ctx.createGain();
     masterGain.gain.value = state.planetVolume;
 
-    const analyser = audioCtx.createAnalyser();
+    const analyser = ctx.createAnalyser();
     analyser.fftSize = 512;
     planetAnalyserNode = analyser;
 
     masterGain.connect(analyser);
-    analyser.connect(audioCtx.destination);
+    analyser.connect(ctx.destination);
 
     const sources = [];
 
-    // Synthesize authentic planetary sounds using Web Audio API
+    // Custom Web Audio API Acoustic Sonification Models
     if (planet.synthType === "sun") {
-        // Deep sub-bass resonance + modulated harmonics
-        const osc1 = audioCtx.createOscillator();
+        const osc1 = ctx.createOscillator();
         osc1.type = "sine";
-        osc1.frequency.value = 110; // Low resonance
+        osc1.frequency.value = 85;
 
-        const osc2 = audioCtx.createOscillator();
+        const osc2 = ctx.createOscillator();
         osc2.type = "triangle";
-        osc2.frequency.value = 165;
+        osc2.frequency.value = 130;
 
-        const lfo = audioCtx.createOscillator();
+        const lfo = ctx.createOscillator();
         lfo.type = "sine";
-        lfo.frequency.value = 0.2; // 5-minute wave modulation
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 25;
+        lfo.frequency.value = 0.25;
+        const lfoGain = ctx.createGain();
+        lfoGain.gain.value = 20;
         lfo.connect(osc1.frequency);
 
         osc1.connect(masterGain);
@@ -216,27 +276,24 @@ function startPlanetAudio(planetId) {
         sources.push(osc1, osc2, lfo);
 
     } else if (planet.synthType === "earth") {
-        // Chorus sweeps + whistlers
-        const osc = audioCtx.createOscillator();
+        const osc = ctx.createOscillator();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
 
-        // Sweep up (bird chorus sound)
         const sweepLoop = () => {
             if (state.activePlanetId !== "earth") return;
-            const now = audioCtx.currentTime;
+            const now = ctx.currentTime;
             osc.frequency.cancelScheduledValues(now);
-            osc.frequency.setValueAtTime(300 + Math.random() * 200, now);
-            osc.frequency.exponentialRampToValueAtTime(1800 + Math.random() * 800, now + 0.6);
-            setTimeout(sweepLoop, 700);
+            osc.frequency.setValueAtTime(350 + Math.random() * 200, now);
+            osc.frequency.exponentialRampToValueAtTime(1900 + Math.random() * 900, now + 0.55);
+            setTimeout(sweepLoop, 650);
         };
         sweepLoop();
 
-        const noise = createNoiseBufferSource();
-        const filter = audioCtx.createBiquadFilter();
+        const noise = createNoiseBufferSource(ctx);
+        const filter = ctx.createBiquadFilter();
         filter.type = "bandpass";
-        filter.frequency.value = 1200;
-        filter.Q.value = 5.0;
+        filter.frequency.value = 1400;
+        filter.Q.value = 4.0;
 
         noise.connect(filter);
         filter.connect(masterGain);
@@ -246,16 +303,15 @@ function startPlanetAudio(planetId) {
         sources.push(noise, osc);
 
     } else if (planet.synthType === "jupiter") {
-        // Decametric plasma roar
-        const noise = createNoiseBufferSource();
-        const filter = audioCtx.createBiquadFilter();
+        const noise = createNoiseBufferSource(ctx);
+        const filter = ctx.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.value = 800;
+        filter.frequency.value = 750;
 
-        const lfo = audioCtx.createOscillator();
-        lfo.frequency.value = 4.5;
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 400;
+        const lfo = ctx.createOscillator();
+        lfo.frequency.value = 5.0;
+        const lfoGain = ctx.createGain();
+        lfoGain.gain.value = 350;
         lfo.connect(filter.frequency);
 
         noise.connect(filter);
@@ -265,17 +321,16 @@ function startPlanetAudio(planetId) {
         sources.push(noise, lfo);
 
     } else if (planet.synthType === "saturn") {
-        // Saturn Kilometric Radiation eerie sweeps
-        const osc = audioCtx.createOscillator();
+        const osc = ctx.createOscillator();
         osc.type = "sine";
 
-        const lfo = audioCtx.createOscillator();
+        const lfo = ctx.createOscillator();
         lfo.type = "triangle";
-        lfo.frequency.value = 0.3;
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 600;
+        lfo.frequency.value = 0.35;
+        const lfoGain = ctx.createGain();
+        lfoGain.gain.value = 550;
 
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(750, ctx.currentTime);
         lfo.connect(osc.frequency);
 
         osc.connect(masterGain);
@@ -284,36 +339,33 @@ function startPlanetAudio(planetId) {
         sources.push(osc, lfo);
 
     } else if (planet.synthType === "mars") {
-        // Martian atmospheric wind rumble
-        const noise = createNoiseBufferSource();
-        const filter = audioCtx.createBiquadFilter();
+        const noise = createNoiseBufferSource(ctx);
+        const filter = ctx.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.value = 180;
+        filter.frequency.value = 160;
         noise.connect(filter);
         filter.connect(masterGain);
         noise.start();
         sources.push(noise);
 
     } else if (planet.synthType === "venus") {
-        // VLF lightning crackles
-        const noise = createNoiseBufferSource();
-        const filter = audioCtx.createBiquadFilter();
+        const noise = createNoiseBufferSource(ctx);
+        const filter = ctx.createBiquadFilter();
         filter.type = "highpass";
-        filter.frequency.value = 2200;
+        filter.frequency.value = 2400;
         noise.connect(filter);
         filter.connect(masterGain);
         noise.start();
         sources.push(noise);
 
     } else {
-        // Default celestial tone generator (Mercury, Moon, Uranus, Neptune, Pluto)
-        const osc = audioCtx.createOscillator();
+        const osc = ctx.createOscillator();
         osc.type = "sawtooth";
-        osc.frequency.value = 220 + Math.random() * 300;
+        osc.frequency.value = 220 + Math.random() * 280;
 
-        const filter = audioCtx.createBiquadFilter();
+        const filter = ctx.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.value = 600;
+        filter.frequency.value = 650;
 
         osc.connect(filter);
         filter.connect(masterGain);
@@ -325,14 +377,14 @@ function startPlanetAudio(planetId) {
     updatePlanetUI();
 }
 
-function createNoiseBufferSource() {
-    const bufferSize = audioCtx.sampleRate * 2;
-    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+function createNoiseBufferSource(ctx) {
+    const bufferSize = ctx.sampleRate * 2;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
     }
-    const whiteNoise = audioCtx.createBufferSource();
+    const whiteNoise = ctx.createBufferSource();
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
     return whiteNoise;
@@ -360,12 +412,12 @@ function updatePlanetUI() {
     renderPlanetGrid();
 }
 
-// --- LIGO Gravitational Wave Chirp Audio ---
+// --- LIGO Gravitational Wave Chirp Engine ---
 let gwOsc = null;
 let gwGain = null;
 
 function playLigoChirp() {
-    ensureAudioCtx();
+    const ctx = getAudioCtx();
     if (gwOsc) {
         try { gwOsc.stop(); } catch (e) {}
     }
@@ -374,24 +426,24 @@ function playLigoChirp() {
     const m2 = parseFloat(document.getElementById("gwMass2").value) || 29;
     const totalMass = m1 + m2;
     const startFreq = 35;
-    const mergeFreq = Math.min(800, Math.max(80, 4400 / totalMass));
+    const mergeFreq = Math.min(850, Math.max(75, 4400 / totalMass));
 
-    gwOsc = audioCtx.createOscillator();
-    gwGain = audioCtx.createGain();
+    gwOsc = ctx.createOscillator();
+    gwGain = ctx.createGain();
 
     gwOsc.type = "sine";
-    const now = audioCtx.currentTime;
-    const duration = 0.5;
+    const now = ctx.currentTime;
+    const duration = 0.55;
 
     gwOsc.frequency.setValueAtTime(startFreq, now);
     gwOsc.frequency.exponentialRampToValueAtTime(mergeFreq, now + duration);
 
     gwGain.gain.setValueAtTime(0.01, now);
-    gwGain.gain.linearRampToValueAtTime(0.4, now + duration * 0.8);
+    gwGain.gain.linearRampToValueAtTime(0.45, now + duration * 0.8);
     gwGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
     gwOsc.connect(gwGain);
-    gwGain.connect(audioCtx.destination);
+    gwGain.connect(ctx.destination);
 
     gwOsc.start(now);
     gwOsc.stop(now + duration + 0.1);
@@ -438,7 +490,7 @@ function renderPlanetGrid() {
     }).join("");
 }
 
-// --- DOM & Visualizer Setup ---
+// --- DOM & Setup ---
 document.addEventListener("DOMContentLoaded", () => {
     loadSavedSignals();
     startClock();
@@ -452,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateOverlayFreqs();
 });
 
-// UTC Clock
 function startClock() {
     setInterval(() => {
         const now = new Date();
@@ -500,7 +551,6 @@ function renderPlanetOscilloscope() {
         }
         planetOscCtx.stroke();
     } else {
-        // Idle line
         planetOscCtx.lineWidth = 1;
         planetOscCtx.strokeStyle = "rgba(148, 163, 184, 0.3)";
         planetOscCtx.beginPath();
@@ -665,6 +715,9 @@ function setupEventListeners() {
         });
     });
 
+    // Spectrum Demod Audio Toggle Button
+    document.getElementById("audioToggleBtn")?.addEventListener("click", toggleDemodAudio);
+
     // Frequency Slider & Tuning
     const freqSlider = document.getElementById("freqSlider");
     if (freqSlider) {
@@ -722,9 +775,10 @@ function setupEventListeners() {
     document.getElementById("stopGwChirpBtn")?.addEventListener("click", stopLigoChirp);
 
     // Research Inputs Listeners
-    ["dishDiameter", "dishFreq", "dishEff", "gwMass1", "gwMass2", "cmbTemp", "cmbFreq", "satAlt", "satElev", "fsplDist", "fsplFreq", "emePower", "emeFreq", "hexInput"].forEach(id => {
+    ["timeMassSelect", "timeRadiusKm", "timeVelocityPct", "gwMass1", "gwMass2", "gwDistanceMpc", "pulsarDm", "pulsarFreq1", "pulsarFreq2", "dishDiameter", "dishFreq", "dishEff", "cmbTemp", "cmbFreq", "satAlt", "satElev", "fsplDist", "fsplFreq", "emePower", "emeFreq", "hexInput"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener("input", updateCalculators);
+        if (el) el.addEventListener("change", updateCalculators);
     });
 
     // Signal Capture
@@ -758,13 +812,71 @@ function setupEventListeners() {
     });
 }
 
-// --- Calculators Engine ---
+// --- Advanced Physics & Astronomy Calculators Engine ---
 function updateCalculators() {
-    // 1. Antenna Gain: G = (pi * D * f / c)^2 * eff
+    // 1. Relativistic & Gravitational Time Dilation
+    const masses = {
+        earth: 5.972e24,
+        jupiter: 1.898e27,
+        sun: 1.989e30,
+        neutron: 2.8 * 1.989e30,
+        sgra: 4.1e6 * 1.989e30
+    };
+    const selectedMassKey = document.getElementById("timeMassSelect")?.value || "earth";
+    const M = masses[selectedMassKey];
+    const rKm = parseFloat(document.getElementById("timeRadiusKm")?.value) || 6371;
+    const rMeters = rKm * 1000;
+    const vPct = parseFloat(document.getElementById("timeVelocityPct")?.value) || 10;
+    const G = 6.67430e-11;
+    const c = 299792458;
+
+    // Schwarzschild radius r_s = 2GM/c^2
+    const rs = (2 * G * M) / Math.pow(c, 2);
+    const gravDilationRatio = (rMeters > rs) ? Math.sqrt(1 - (rs / rMeters)) : 0;
+    const gravRedshift = (1 / gravDilationRatio - 1);
+
+    // Special Relativity Lorentz Factor gamma = 1 / sqrt(1 - v^2/c^2)
+    const beta = Math.min(0.99999, vPct / 100);
+    const gamma = 1 / Math.sqrt(1 - Math.pow(beta, 2));
+
+    const totalTimeRatio = (1 / gravDilationRatio) * gamma;
+    const timeRes = document.getElementById("timeDilationResult");
+    if (timeRes) {
+        timeRes.textContent = `Schwarzschild Radius r_s: ${(rs/1000).toFixed(2)} km | Gravitational Redshift: ${gravRedshift.toExponential(3)} | Lorentz Factor γ: ${gamma.toFixed(4)} | Combined Time Dilation: ${totalTimeRatio.toFixed(5)}x slower`;
+    }
+
+    // 2. Gravitational Wave Chirp & Peak Strain
+    const m1 = parseFloat(document.getElementById("gwMass1")?.value) || 36;
+    const m2 = parseFloat(document.getElementById("gwMass2")?.value) || 29;
+    const distMpc = parseFloat(document.getElementById("gwDistanceMpc")?.value) || 410;
+    const mTotal = m1 + m2;
+    const chirpMass = (Math.pow(m1 * m2, 3/5) / Math.pow(mTotal, 1/5)).toFixed(1);
+    const mergeFreq = (4400 / mTotal).toFixed(1);
+
+    // Strain amplitude approximation h ~ (4 G^2 M1 M2) / (r c^4 d)
+    const distMeters = distMpc * 3.086e22;
+    const m1Kg = m1 * 1.989e30;
+    const m2Kg = m2 * 1.989e30;
+    const strain = ((4 * Math.pow(G, 2) * m1Kg * m2Kg) / (Math.pow(c, 4) * distMeters)).toExponential(2);
+    const gwRes = document.getElementById("gwResult");
+    if (gwRes) {
+        gwRes.textContent = `Chirp Mass Mchirp: ${chirpMass} M☉ | Merge Frequency f_max: ${mergeFreq} Hz | Gravitational Wave Strain h: ${strain}`;
+    }
+
+    // 3. Pulsar Interstellar Dispersion Measure
+    const dm = parseFloat(document.getElementById("pulsarDm")?.value) || 12.5;
+    const f1 = parseFloat(document.getElementById("pulsarFreq1")?.value) || 1420;
+    const f2 = parseFloat(document.getElementById("pulsarFreq2")?.value) || 430;
+    const delaySec = (4.15e3 * dm * (Math.pow(f2, -2) - Math.pow(f1, -2))).toFixed(3);
+    const pulsarRes = document.getElementById("pulsarResult");
+    if (pulsarRes) {
+        pulsarRes.textContent = `Interstellar Delay t_delay: ${delaySec} sec | DM: ${dm} pc/cm³ | Frequencies: ${f1} & ${f2} MHz`;
+    }
+
+    // 4. Antenna Gain
     const d = parseFloat(document.getElementById("dishDiameter")?.value) || 3.0;
     const fMhz = parseFloat(document.getElementById("dishFreq")?.value) || 1420.405;
     const eff = (parseFloat(document.getElementById("dishEff")?.value) || 60) / 100;
-    const c = 299792458;
     const wavelength = c / (fMhz * 1e6);
     const gainLinear = Math.pow((Math.PI * d) / wavelength, 2) * eff;
     const gainDbi = (10 * Math.log10(gainLinear)).toFixed(2);
@@ -772,40 +884,32 @@ function updateCalculators() {
     const antRes = document.getElementById("antennaResult");
     if (antRes) antRes.textContent = `Gain: ${gainDbi} dBi | HPBW: ${hpbw}° | Wavelength λ: ${(wavelength * 100).toFixed(2)} cm`;
 
-    // 2. Gravitational Wave Chirp Mass & Merge Frequency
-    const m1 = parseFloat(document.getElementById("gwMass1")?.value) || 36;
-    const m2 = parseFloat(document.getElementById("gwMass2")?.value) || 29;
-    const mTotal = m1 + m2;
-    const chirpMass = (Math.pow(m1 * m2, 3/5) / Math.pow(mTotal, 1/5)).toFixed(1);
-    const mergeFreq = (4400 / mTotal).toFixed(1);
-    const gwRes = document.getElementById("gwResult");
-    if (gwRes) gwRes.textContent = `Chirp Mass Mchirp: ${chirpMass} M☉ | Merge Frequency f_max: ${mergeFreq} Hz`;
-
-    // 3. CMB Blackbody Spectrum
+    // 5. CMB Spectrum
     const cmbT = parseFloat(document.getElementById("cmbTemp")?.value) || 2.7255;
     const cmbF = parseFloat(document.getElementById("cmbFreq")?.value) || 160.2;
     const peakFreqGhz = (58.789 * cmbT).toFixed(1);
     const cmbRes = document.getElementById("cmbResult");
     if (cmbRes) cmbRes.textContent = `Peak Frequency: ${peakFreqGhz} GHz | Peak Wavelength: ${(300 / peakFreqGhz).toFixed(2)} mm | Temp: ${cmbT} K`;
 
-    // 4. Satellite Orbital Period
+    // 6. Satellite Orbital Mechanics & Escape Velocity
     const alt = parseFloat(document.getElementById("satAlt")?.value) || 408;
-    const r = 6371 + alt;
+    const rOrbit = 6371 + alt;
     const mu = 398600.4418;
-    const periodSec = 2 * Math.PI * Math.sqrt(Math.pow(r, 3) / mu);
+    const periodSec = 2 * Math.PI * Math.sqrt(Math.pow(rOrbit, 3) / mu);
     const periodMin = (periodSec / 60).toFixed(2);
-    const speed = Math.sqrt(mu / r).toFixed(2);
+    const speed = Math.sqrt(mu / rOrbit).toFixed(2);
+    const escapeSpeed = (speed * Math.sqrt(2)).toFixed(2);
     const satRes = document.getElementById("satResult");
-    if (satRes) satRes.textContent = `Period: ${periodMin} min | Orbital Velocity: ${speed} km/s`;
+    if (satRes) satRes.textContent = `Period: ${periodMin} min | Orbital Velocity: ${speed} km/s | Escape Velocity: ${escapeSpeed} km/s`;
 
-    // 5. FSPL
+    // 7. FSPL
     const fsplD = parseFloat(document.getElementById("fsplDist")?.value) || 1;
     const fsplF = parseFloat(document.getElementById("fsplFreq")?.value) || 1;
     const fspl = (20 * Math.log10(fsplD) + 20 * Math.log10(fsplF) + 32.44).toFixed(2);
     const fsplRes = document.getElementById("fsplResult");
     if (fsplRes) fsplRes.textContent = `Attenuation: ${fspl} dB`;
 
-    // 6. EME Echo
+    // 8. EME Echo
     const emePowerW = parseFloat(document.getElementById("emePower")?.value) || 100;
     const emeF = parseFloat(document.getElementById("emeFreq")?.value) || 1296;
     const distMoonKm = 384400;
@@ -814,7 +918,7 @@ function updateCalculators() {
     const emeRes = document.getElementById("emeResult");
     if (emeRes) emeRes.textContent = `Delay: ${delay} sec | Total Path Loss: ${emeLoss} dB`;
 
-    // 7. Telemetry Hex Inspector
+    // 9. Telemetry Hex Inspector
     const hex = document.getElementById("hexInput")?.value.trim() || "";
     try {
         const hexTokens = hex.split(/\s+/).filter(t => t.length > 0);

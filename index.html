@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VictorRadio - Deep Space & Planetary RF Sound Explorer</title>
+    <title>VictorRadio - Deep Space Research & Planetary RF Sound Explorer</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -15,7 +15,7 @@
                 <div class="logo-icon">📡</div>
                 <div>
                     <h1>VICTOR RADIO</h1>
-                    <p class="subtitle">Deep Space Research & Solar System Audio Laboratory</p>
+                    <p class="subtitle">Deep Space Research, Relativistic Physics & Solar System Audio Laboratory</p>
                 </div>
             </div>
             <div class="header-right">
@@ -33,13 +33,13 @@
 
         <!-- Main Layout Grid -->
         <main class="main-grid">
-            <!-- Left Column: Spectrum & Main Working Panel -->
+            <!-- Left Column: Main Working Panel -->
             <section class="panel main-panel">
                 <!-- Navigation Tabs -->
                 <div class="top-tab-bar">
                     <button class="top-tab-btn active" data-tab="tab-spectrum">📡 Spectrum & Waterfall</button>
                     <button class="top-tab-btn" data-tab="tab-planets">🪐 Solar System Sound Lab</button>
-                    <button class="top-tab-btn" data-tab="tab-research">🔬 Space Research Tools</button>
+                    <button class="top-tab-btn" data-tab="tab-research">🔬 Space & Gravity Physics Tools</button>
                     <button class="top-tab-btn" data-tab="tab-library">💾 Signal Library</button>
                 </div>
 
@@ -48,7 +48,7 @@
                     <div class="panel-header">
                         <div class="title-group">
                             <h2>LIVE SPECTRUM ANALYZER & WATERFALL</h2>
-                            <span class="sub-tag">DSP FFT ANALYZER</span>
+                            <span class="sub-tag">REAL-TIME DSP FFT</span>
                         </div>
                         <div class="header-actions">
                             <span class="badge neon-green" id="snrBadge">SNR: -- dB</span>
@@ -83,7 +83,7 @@
                             <span>💾 CAPTURE SIGNAL</span>
                         </button>
                         <button id="audioToggleBtn" class="btn btn-outline">
-                            <span>🔇 UNMUTE DEMOD AUDIO</span>
+                            <span>🔊 START DEMOD AUDIO</span>
                         </button>
                     </div>
 
@@ -143,8 +143,8 @@
                             <div class="global-audio-controls">
                                 <button id="stopAllAudioBtn" class="btn btn-danger">⏹ STOP ALL AUDIO</button>
                                 <div class="volume-control">
-                                    <label>VOL: <span id="planetVolVal">70%</span></label>
-                                    <input type="range" id="planetVolumeSlider" min="0" max="100" value="70">
+                                    <label>VOL: <span id="planetVolVal">80%</span></label>
+                                    <input type="range" id="planetVolumeSlider" min="0" max="100" value="80">
                                 </div>
                             </div>
                         </div>
@@ -170,14 +170,99 @@
                     </div>
                 </div>
 
-                <!-- Tab 3: Space Research Tools -->
+                <!-- Tab 3: Advanced Space & Relativistic Gravity Physics Tools -->
                 <div id="tab-research" class="tab-pane">
                     <div class="research-tools-container">
-                        <h2>ADVANCED SPACE RESEARCH & ASTROPHYSICS CALCULATORS</h2>
-                        <p class="lab-desc">Interactive tools for radio astronomy, satellite orbit propagation, antenna design, and astrophysics research.</p>
+                        <h2>ADVANCED ASTROPHYSICS, GRAVITY & TIME PHYSICS CALCULATORS</h2>
+                        <p class="lab-desc">Interactive tools for radio astronomy, relativistic time dilation, gravitational wave strain, orbital mechanics, and pulsar dispersion measure.</p>
 
                         <div class="tools-grid">
-                            <!-- Tool 1: Antenna Gain -->
+                            <!-- Tool 1: Gravitational & Velocity Time Dilation -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>⏳ EINSTEIN RELATIVISTIC & GRAVITATIONAL TIME DILATION</h3>
+                                    <span class="tool-tag">GENERAL & SPECIAL RELATIVITY</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Central Mass Body</label>
+                                            <select id="timeMassSelect">
+                                                <option value="earth">Earth (5.972 × 10²⁴ kg)</option>
+                                                <option value="jupiter">Jupiter (1.898 × 10²⁷ kg)</option>
+                                                <option value="sun">Sun (1.989 × 10³⁰ kg)</option>
+                                                <option value="neutron">Neutron Star (2.8 M☉)</option>
+                                                <option value="sgra">Sagittarius A* Black Hole (4.1 × 10⁶ M☉)</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Distance / Orbital Radius r (km)</label>
+                                            <input type="number" id="timeRadiusKm" value="6371" step="10">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Velocity v (% Speed of Light c)</label>
+                                            <input type="number" id="timeVelocityPct" value="10" min="0" max="99.999" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="timeDilationResult">Gravitational Redshift: 6.96 × 10⁻¹⁰ | Lorentz Factor γ: 1.005 | Time Dilation Rate: 1.0051x slower</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 2: Gravitational Wave Chirp & Strain -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>🌌 GRAVITATIONAL WAVE CHIRP & STRAIN SYNTHESIZER</h3>
+                                    <span class="tool-tag">LIGO / VIRGO ASTROPHYSICS</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Primary Mass M1 (M☉)</label>
+                                            <input type="number" id="gwMass1" value="36" step="1">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Secondary Mass M2 (M☉)</label>
+                                            <input type="number" id="gwMass2" value="29" step="1">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Luminosity Dist (Mpc)</label>
+                                            <input type="number" id="gwDistanceMpc" value="410" step="10">
+                                        </div>
+                                    </div>
+                                    <div class="gw-actions">
+                                        <button id="playGwChirpBtn" class="btn btn-primary">▶ PLAY LIGO CHIRP AUDIO</button>
+                                        <button id="stopGwChirpBtn" class="btn btn-secondary">⏹ STOP CHIRP</button>
+                                    </div>
+                                    <div class="calc-result" id="gwResult">Chirp Mass: 28.1 M☉ | Merge Freq: 157.3 Hz | Peak Strain h: 1.2 × 10⁻²¹</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 3: Pulsar Interstellar Dispersion Measure -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>💫 PULSAR INTERSTELLAR DISPERSION MEASURE (DM)</h3>
+                                    <span class="tool-tag">PULSAR TIMING</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Dispersion Measure DM (pc/cm³)</label>
+                                            <input type="number" id="pulsarDm" value="12.5" step="0.5">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>High Freq f1 (MHz)</label>
+                                            <input type="number" id="pulsarFreq1" value="1420.0" step="10">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Low Freq f2 (MHz)</label>
+                                            <input type="number" id="pulsarFreq2" value="430.0" step="10">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="pulsarResult">Plasma Time Delay: 0.255 sec | Free Electron Column Density: 3.86 × 10¹⁹ e⁻/cm²</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 4: Parabolic Antenna Gain & Beamwidth -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
                                     <h3>📡 PARABOLIC ANTENNA GAIN & BEAMWIDTH</h3>
@@ -202,32 +287,7 @@
                                 </div>
                             </div>
 
-                            <!-- Tool 2: Gravitational Wave Chirp -->
-                            <div class="research-tool-card">
-                                <div class="tool-card-header">
-                                    <h3>🌌 GRAVITATIONAL WAVE CHIRP SYNTHESIZER</h3>
-                                    <span class="tool-tag">LIGO / VIRGO ASTROPHYSICS</span>
-                                </div>
-                                <div class="tool-form">
-                                    <div class="form-row">
-                                        <div class="input-field">
-                                            <label>Primary Mass M1 (Solar Masses M☉)</label>
-                                            <input type="number" id="gwMass1" value="36" step="1">
-                                        </div>
-                                        <div class="input-field">
-                                            <label>Secondary Mass M2 (Solar Masses M☉)</label>
-                                            <input type="number" id="gwMass2" value="29" step="1">
-                                        </div>
-                                    </div>
-                                    <div class="gw-actions">
-                                        <button id="playGwChirpBtn" class="btn btn-primary">▶ PLAY LIGO CHIRP AUDIO</button>
-                                        <button id="stopGwChirpBtn" class="btn btn-secondary">⏹ STOP CHIRP</button>
-                                    </div>
-                                    <div class="calc-result" id="gwResult">Chirp Mass: 28.1 M☉ | Merge Freq: 157.3 Hz | Signal: GW150914 Binary Black Hole</div>
-                                </div>
-                            </div>
-
-                            <!-- Tool 3: CMB Radiation Spectrum -->
+                            <!-- Tool 5: CMB Radiation Spectrum -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
                                     <h3>✨ COSMIC MICROWAVE BACKGROUND (CMB) SPECTRUM</h3>
@@ -248,10 +308,10 @@
                                 </div>
                             </div>
 
-                            <!-- Tool 4: Satellite Orbit Period & Delay -->
+                            <!-- Tool 6: Satellite Orbit Period & Delay -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
-                                    <h3>🛰️ SATELLITE ORBITAL PERIOD & RANGE DELAY</h3>
+                                    <h3>🛰️ SATELLITE ORBITAL MECHANICS & ESCAPE VELOCITY</h3>
                                     <span class="tool-tag">ORBITAL MECHANICS</span>
                                 </div>
                                 <div class="tool-form">
@@ -265,11 +325,11 @@
                                             <input type="number" id="satElev" value="45" step="1">
                                         </div>
                                     </div>
-                                    <div class="calc-result" id="satResult">Period: 92.68 min | Speed: 7.67 km/s | Slant Range: 562.8 km | Propagation Delay: 1.88 ms</div>
+                                    <div class="calc-result" id="satResult">Period: 92.68 min | Speed: 7.67 km/s | Escape Speed: 10.84 km/s</div>
                                 </div>
                             </div>
 
-                            <!-- Tool 5: FSPL Calculator -->
+                            <!-- Tool 7: FSPL Calculator -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
                                     <h3>📡 FREE SPACE PATH LOSS (FSPL)</h3>
@@ -290,7 +350,7 @@
                                 </div>
                             </div>
 
-                            <!-- Tool 6: EME Echo -->
+                            <!-- Tool 8: EME Echo -->
                             <div class="research-tool-card">
                                 <div class="tool-card-header">
                                     <h3>🌕 EARTH-MOON-EARTH (EME) BOUNCE</h3>
@@ -311,7 +371,7 @@
                                 </div>
                             </div>
 
-                            <!-- Tool 7: Telemetry Hex -->
+                            <!-- Tool 9: Telemetry Hex -->
                             <div class="research-tool-card full-width-card">
                                 <div class="tool-card-header">
                                     <h3>💻 TELEMETRY HEX PACKET INSPECTOR</h3>
