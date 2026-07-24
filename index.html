@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VictorRadio - Deep Space & Planetary RF Sound Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon">📡</div>
+                <div>
+                    <h1>VICTOR RADIO</h1>
+                    <p class="subtitle">Deep Space Research & Solar System Audio Laboratory</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="planet-audio-status" id="headerAudioStatus">
+                    <span class="status-indicator-dot"></span>
+                    <span id="activePlanetLabel">AUDIO: IDLE</span>
+                </div>
+                <div class="operator-badge">
+                    <span class="status-dot"></span>
+                    <span id="operatorCallsign">OBSERVER-ALPHA</span>
+                    <span class="utc-clock" id="utcClock">00:00:00 UTC</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <main class="main-grid">
+            <!-- Left Column: Spectrum & Main Working Panel -->
+            <section class="panel main-panel">
+                <!-- Navigation Tabs -->
+                <div class="top-tab-bar">
+                    <button class="top-tab-btn active" data-tab="tab-spectrum">📡 Spectrum & Waterfall</button>
+                    <button class="top-tab-btn" data-tab="tab-planets">🪐 Solar System Sound Lab</button>
+                    <button class="top-tab-btn" data-tab="tab-research">🔬 Space Research Tools</button>
+                    <button class="top-tab-btn" data-tab="tab-library">💾 Signal Library</button>
+                </div>
+
+                <!-- Tab 1: Live Spectrum & Waterfall -->
+                <div id="tab-spectrum" class="tab-pane active">
+                    <div class="panel-header">
+                        <div class="title-group">
+                            <h2>LIVE SPECTRUM ANALYZER & WATERFALL</h2>
+                            <span class="sub-tag">DSP FFT ANALYZER</span>
+                        </div>
+                        <div class="header-actions">
+                            <span class="badge neon-green" id="snrBadge">SNR: -- dB</span>
+                            <span class="badge amber" id="peakPowerBadge">PEAK: -- dBm</span>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Visualizers -->
+                    <div class="canvas-container">
+                        <div class="canvas-wrapper spectrum-wrapper">
+                            <div class="canvas-overlay-info">
+                                <span id="overlayFreqLeft">-- MHz</span>
+                                <span id="overlayFreqCenter">CENTER: 1420.405 MHz</span>
+                                <span id="overlayFreqRight">-- MHz</span>
+                            </div>
+                            <canvas id="spectrumCanvas"></canvas>
+                        </div>
+                        <div class="canvas-wrapper waterfall-wrapper">
+                            <canvas id="waterfallCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Controls -->
+                    <div class="quick-controls">
+                        <button id="autoPeakBtn" class="btn btn-primary">
+                            <span>⚡ AUTO PEAK LOCK</span>
+                        </button>
+                        <button id="notchFilterBtn" class="btn btn-secondary">
+                            <span>🚫 NOTCH FILTER: OFF</span>
+                        </button>
+                        <button id="captureSignalBtn" class="btn btn-amber">
+                            <span>💾 CAPTURE SIGNAL</span>
+                        </button>
+                        <button id="audioToggleBtn" class="btn btn-outline">
+                            <span>🔇 UNMUTE DEMOD AUDIO</span>
+                        </button>
+                    </div>
+
+                    <!-- Frequency & RF Controls Bar -->
+                    <div class="rf-controls-grid">
+                        <div class="control-group main-freq-group">
+                            <label for="freqSlider">CENTER FREQ (MHz)</label>
+                            <div class="freq-input-wrapper">
+                                <div class="number-display" id="freqValueDisplay">1420.405000</div>
+                                <button id="fineTuneDownBtn" class="tune-btn" title="Tune -0.025 MHz">-</button>
+                                <button id="fineTuneUpBtn" class="tune-btn" title="Tune +0.025 MHz">+</button>
+                            </div>
+                            <input type="range" id="freqSlider" min="100" max="3000" step="0.005" value="1420.405">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="bandwidthSelect">BANDWIDTH</label>
+                            <select id="bandwidthSelect">
+                                <option value="0.2">200 kHz (Narrow)</option>
+                                <option value="1.0" selected>1.0 MHz (Standard)</option>
+                                <option value="5.0">5.0 MHz (Wideband)</option>
+                                <option value="20.0">20.0 MHz (Ultra-Wide)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="demodSelect">DEMODULATION</label>
+                            <select id="demodSelect">
+                                <option value="FM">FM (Frequency Mod)</option>
+                                <option value="AM">AM (Amplitude Mod)</option>
+                                <option value="USB" selected>USB (Upper Sideband)</option>
+                                <option value="LSB">LSB (Lower Sideband)</option>
+                                <option value="CW">CW (Morse Telegraphy)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="gainSlider">RF GAIN: <span id="gainValue">24 dB</span></label>
+                            <input type="range" id="gainSlider" min="0" max="60" value="24">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="squelchSlider">SQUELCH: <span id="squelchValue">-90 dBm</span></label>
+                            <input type="range" id="squelchSlider" min="-120" max="-40" value="-90">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Solar System Sound Lab -->
+                <div id="tab-planets" class="tab-pane">
+                    <div class="planet-lab-container">
+                        <div class="planet-lab-header">
+                            <div>
+                                <h2>SOLAR SYSTEM PLANETARY AUDIO LABORATORY</h2>
+                                <p class="lab-desc">Authentic sonification of magnetospheric plasma waves, atmospheric turbulence, helioseismology, & radio emissions for educational research.</p>
+                            </div>
+                            <div class="global-audio-controls">
+                                <button id="stopAllAudioBtn" class="btn btn-danger">⏹ STOP ALL AUDIO</button>
+                                <div class="volume-control">
+                                    <label>VOL: <span id="planetVolVal">70%</span></label>
+                                    <input type="range" id="planetVolumeSlider" min="0" max="100" value="70">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Planet Audio Visualizer Banner -->
+                        <div class="planet-audio-visualizer-card">
+                            <div class="viz-header">
+                                <span class="viz-title" id="nowPlayingTitle">SELECT A CELESTIAL BODY TO PLAY AUDIO</span>
+                                <span class="viz-freq" id="nowPlayingFreq">--</span>
+                            </div>
+                            <div class="audio-canvas-wrapper">
+                                <canvas id="planetOscilloscopeCanvas"></canvas>
+                            </div>
+                            <div class="viz-footer" id="nowPlayingDesc">
+                                Click ▶ START AUDIO on any planet card below to listen clearly to its authentic acoustic sonification.
+                            </div>
+                        </div>
+
+                        <!-- Planet Grid -->
+                        <div class="planet-grid" id="planetGridContainer">
+                            <!-- Dynamically generated planet cards -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Space Research Tools -->
+                <div id="tab-research" class="tab-pane">
+                    <div class="research-tools-container">
+                        <h2>ADVANCED SPACE RESEARCH & ASTROPHYSICS CALCULATORS</h2>
+                        <p class="lab-desc">Interactive tools for radio astronomy, satellite orbit propagation, antenna design, and astrophysics research.</p>
+
+                        <div class="tools-grid">
+                            <!-- Tool 1: Antenna Gain -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>📡 PARABOLIC ANTENNA GAIN & BEAMWIDTH</h3>
+                                    <span class="tool-tag">RF RADIO ASTRONOMY</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Dish Diameter D (meters)</label>
+                                            <input type="number" id="dishDiameter" value="3.0" step="0.1">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Frequency f (MHz)</label>
+                                            <input type="number" id="dishFreq" value="1420.405" step="0.1">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Efficiency η (%)</label>
+                                            <input type="number" id="dishEff" value="60" step="1">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="antennaResult">Gain: 31.02 dBi | HPBW: 4.93°</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 2: Gravitational Wave Chirp -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>🌌 GRAVITATIONAL WAVE CHIRP SYNTHESIZER</h3>
+                                    <span class="tool-tag">LIGO / VIRGO ASTROPHYSICS</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Primary Mass M1 (Solar Masses M☉)</label>
+                                            <input type="number" id="gwMass1" value="36" step="1">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Secondary Mass M2 (Solar Masses M☉)</label>
+                                            <input type="number" id="gwMass2" value="29" step="1">
+                                        </div>
+                                    </div>
+                                    <div class="gw-actions">
+                                        <button id="playGwChirpBtn" class="btn btn-primary">▶ PLAY LIGO CHIRP AUDIO</button>
+                                        <button id="stopGwChirpBtn" class="btn btn-secondary">⏹ STOP CHIRP</button>
+                                    </div>
+                                    <div class="calc-result" id="gwResult">Chirp Mass: 28.1 M☉ | Merge Freq: 157.3 Hz | Signal: GW150914 Binary Black Hole</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 3: CMB Radiation Spectrum -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>✨ COSMIC MICROWAVE BACKGROUND (CMB) SPECTRUM</h3>
+                                    <span class="tool-tag">COSMOLOGY</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>CMB Temperature T (Kelvin)</label>
+                                            <input type="number" id="cmbTemp" value="2.7255" step="0.0001">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Target Frequency (GHz)</label>
+                                            <input type="number" id="cmbFreq" value="160.2" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="cmbResult">Peak Freq: 160.2 GHz | Peak Wavelength: 1.06 mm | Energy Density: 4.17 × 10⁻¹⁴ J/m³</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 4: Satellite Orbit Period & Delay -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>🛰️ SATELLITE ORBITAL PERIOD & RANGE DELAY</h3>
+                                    <span class="tool-tag">ORBITAL MECHANICS</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Orbital Altitude (km)</label>
+                                            <input type="number" id="satAlt" value="408" step="10">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Elevation Angle (°)</label>
+                                            <input type="number" id="satElev" value="45" step="1">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="satResult">Period: 92.68 min | Speed: 7.67 km/s | Slant Range: 562.8 km | Propagation Delay: 1.88 ms</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 5: FSPL Calculator -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>📡 FREE SPACE PATH LOSS (FSPL)</h3>
+                                    <span class="tool-tag">PROPAGATION</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Dist (km)</label>
+                                            <input type="number" id="fsplDist" value="149600000">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Freq (MHz)</label>
+                                            <input type="number" id="fsplFreq" value="1420.405">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="fsplResult">Attenuation: 259.04 dB</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 6: EME Echo -->
+                            <div class="research-tool-card">
+                                <div class="tool-card-header">
+                                    <h3>🌕 EARTH-MOON-EARTH (EME) BOUNCE</h3>
+                                    <span class="tool-tag">LUNAR BOUNCE</span>
+                                </div>
+                                <div class="tool-form">
+                                    <div class="form-row">
+                                        <div class="input-field">
+                                            <label>Tx Power (W)</label>
+                                            <input type="number" id="emePower" value="100">
+                                        </div>
+                                        <div class="input-field">
+                                            <label>Freq (MHz)</label>
+                                            <input type="number" id="emeFreq" value="1296.0">
+                                        </div>
+                                    </div>
+                                    <div class="calc-result" id="emeResult">Delay: 2.565 sec | Path Loss: 271.4 dB</div>
+                                </div>
+                            </div>
+
+                            <!-- Tool 7: Telemetry Hex -->
+                            <div class="research-tool-card full-width-card">
+                                <div class="tool-card-header">
+                                    <h3>💻 TELEMETRY HEX PACKET INSPECTOR</h3>
+                                    <span class="tool-tag">DECODER</span>
+                                </div>
+                                <div class="tool-form">
+                                    <textarea id="hexInput" rows="2" placeholder="Hex bytes...">36 45 51 55 4A 35 20 53 45 54 49 20 48 59 44 52 4F 47 45 4E</textarea>
+                                    <div class="calc-result" id="hexResult">Decoded: 6EQUJ5 SETI HYDROGEN</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Signal Library -->
+                <div id="tab-library" class="tab-pane">
+                    <div class="library-container">
+                        <div class="library-header-bar">
+                            <h2>CAPTURED RF SIGNALS & COSMIC LIBRARY</h2>
+                            <div class="library-actions">
+                                <button id="exportJsonBtn" class="btn btn-small btn-primary">EXPORT JSON</button>
+                                <button id="exportCsvBtn" class="btn btn-small btn-secondary">EXPORT CSV</button>
+                                <button id="clearLibraryBtn" class="btn btn-small btn-danger">CLEAR ALL</button>
+                            </div>
+                        </div>
+                        <div id="savedSignalsList" class="signals-grid">
+                            <!-- Saved signals dynamically listed here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Space Catalog Quick Sidebar -->
+            <section class="panel side-panel">
+                <div class="sidebar-header">
+                    <h3>DEEP SPACE TARGETS</h3>
+                    <span class="sub-tag">CATALOG</span>
+                </div>
+                <div class="catalog-header">
+                    <input type="text" id="targetSearchInput" placeholder="Search targets..." class="search-input">
+                </div>
+                <div class="catalog-list" id="targetList">
+                    <!-- Dynamic Space Targets rendered here by script.js -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
