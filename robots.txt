@@ -1,0 +1,8 @@
+# robots.txt for VictorRadio (https://victor-radio.vercel.app)
+# UTF-8 encoded search engine crawler directives
+
+User-agent: *
+Allow: /
+
+Sitemap: https://victor-radio.vercel.app/sitemap.xml
+
